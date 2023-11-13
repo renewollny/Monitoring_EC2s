@@ -1,0 +1,20 @@
+route:
+  group_by: ["alertname"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 1h
+  receiver: "aws.sns"
+
+receivers:
+- name: "aws.sns"
+  sns_configs:
+  - sigv4:
+    region: eu-central-1
+    topic_arn: # von Terraform ausgeben lassen und hier einfügen!!!
+
+inhibit_rules:
+- source_match:
+    severity: "critical"
+  target_match:
+    severity: "warning"
+  equal: ["alertname", "dev", "instance"]

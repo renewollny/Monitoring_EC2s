@@ -10,7 +10,7 @@ receivers:
   sns_configs:
   - sigv4:
     region: eu-central-1
-    topic_arn: # von Terraform ausgeben lassen und hier einfügen!!!
+    topic_arn: arn:aws:sns:eu-central-1:909631119892:alertmanager_sns # von Terraform ausgeben lassen und hier einfügen!!!
 
 inhibit_rules:
 - source_match:

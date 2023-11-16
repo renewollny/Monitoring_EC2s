@@ -19,4 +19,5 @@ Terraform-Updates:
 
 Ansible-Updates:
 - hosts-Datei in Init-Schreibweise inkl. Übergabe von gemeinsamen Variablen an die unterschiedlichen Hosts
-- 
+- Rollen eingefügt
+- Handlers eingefügt

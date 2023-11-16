@@ -15,6 +15,7 @@ Terraform-Updates:
 - SSH-Key als Variable in "dev_vars.auto.tfvars"-Datei
 - Instance-AMI und Instance-Typ als Variable in dem EC2-Modul
 - Subnet-CIDRs und Availability-Zones als Variable für VPC-Modul
+- SNS als Modul angelegt
 
 Ansible-Updates:
 - hosts-Datei in Init-Schreibweise inkl. Übergabe von gemeinsamen Variablen an die unterschiedlichen Hosts

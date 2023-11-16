@@ -6,51 +6,54 @@
 
 - name: create directory
   file:
-    path: /home/ubuntu/alertmanager
+    path: "{{ download_path }}/alertmanager"
     state: directory
 
-- name: download alertmanager
+- name: download node exporter
   get_url:
-    url: "https://github.com/prometheus/alertmanager/releases/download/v0.26.0/alertmanager-0.26.0.linux-amd64.tar.gz"
-    dest: "/home/ubuntu/alertmanager/alertmanager-0.26.0.linux-amd64.tar.gz"
+    url: "https://github.com/prometheus/alertmanager/releases/download/v{{ alertmanager_version }}/alertmanager-{{ alertmanager_version }}.linux-amd64.tar.gz"
+    dest: "/home/ubuntu/alertmanager/alertmanager-{{ alertmanager_version }}.linux-amd64.tar.gz"
 
 - name: unpack installation files
   unarchive:
-    src: "/home/ubuntu/alertmanager/alertmanager-0.26.0.linux-amd64.tar.gz"
-    dest: "/home/ubuntu/alertmanager"
+    src: "{{ download_path }}/alertmanager/alertmanager-{{ alertmanager_version }}.linux-amd64.tar.gz"
+    dest: "{{ download_path }}/alertmanager"
     remote_src: yes
 
 - name: move files
   copy:
-    src: "/home/ubuntu/alertmanager/alertmanager-0.26.0.linux-amd64/"
-    dest: "/usr/local/bin/alertmanager/"
+    src: "{{ download_path }}/alertmanager/alertmanager-{{ alertmanager_version }}.linux-amd64/"
+    dest: "{{ destination_path }}/alertmanager/"
     remote_src: yes
-
-- name: create config file
-  ansible.builtin.copy:
-    src: "/files/alertmanager.yml"
-    dest: "/usr/local/bin/alertmanager/alertmanager.yml"
-
-- name: create env-file
-  ansible.builtin.copy:
-    src: "/files/alertmanager.env"
-    dest: "/usr/local/bin/alertmanager/alertmanager.env"
 
 - name: create service file
   copy:
     dest: "/etc/systemd/system/alertmanager.service"
     content: |
       [Unit]
-      Description=AlertManager Service
+      Description=Alertmanager Service
       After=network.target
 
       [Service]
       Type=simple
-      ExecStart=/usr/local/bin/alertmanager/alertmanager --config.file=/usr/local/bin/alertmanager/alertmanager.yml
-      EnvironmentFile=/usr/local/bin/alertmanager/alertmanager/alertmanager.env
+      ExecStart={{ destination_path }}/alertmanager/alertmanager --config.file={{ destination_path }}/alertmanager/alertmanager.yml
+      EnvironmentFile={{ destination_path }}/alertmanager/alertmanager.env
 
       [Install]
       WantedBy=multi-user.target
+
+- name: create env file
+  ansible.builtin.copy:
+    dest: "{{ destination_path }}/alertmanager/alertmanager.env"
+    content: |
+      AWS_ACCESS_KEY_ID={{ aws_access_key_id }}
+      AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }}
+      AWS_SESSION_TOKEN={{ aws_session_token }}
+
+- name: copy alertmanager config file
+  ansible.builtin.template:
+    src: files/alertmanager.yml.j2
+    dest: "{{ destination_path }}/alertmanager/alertmanager.yml"
 
 - name: service always started
   systemd:
